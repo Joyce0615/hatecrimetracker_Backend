@@ -30,6 +30,8 @@ from firestore.incidents import deleteIncident, getIncidents, getStats, insertIn
 from firestore.tokens import add_token
 import incident_publisher
 
+from utils.upload_artifacts import uploadArtifact
+
 # [END gae_python3_datastore_store_and_fetch_user_times]
 # [END gae_python38_datastore_store_and_fetch_user_times]
 app = Flask(__name__)
@@ -198,6 +200,7 @@ def publish_incidents():
 #     traverse_file("data.json")
 #     return "success"
 
+# from load_data import load_from_csv
 # @app.route('/loadcsv')
 # def load_csv():
 #     #Load incidents from loaddata_result.csv
@@ -217,6 +220,19 @@ def register_token():
 
     res = add_token(deviceId, token)
     return {"success": True}
+
+
+@app.route('/upload_artifacts', methods=['POST'])
+def upload():
+    # Output {"status": failure / success, "error_message": any error messages}
+    if 'file' not in request.files:
+        return {"status": "failure", "error_message": "No file part in the request"}
+
+    file = request.files['file']
+    result = uploadArtifact(file)
+
+    # Output: "status": "failure/success", "url": None, "error_message": any error message
+    return result
 
 
 if __name__ == "__main__":
